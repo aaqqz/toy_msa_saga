@@ -1,5 +1,6 @@
 package com.saga.account.domain;
 
+import com.saga.common.dto.TransferDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -38,8 +40,25 @@ public class AccountTransaction {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    public static AccountTransaction withdraw(String sagaId, TransferDto.TransferRequest request, Account fromAccount) {
+        // 출금
+        AccountTransaction entity = new AccountTransaction();
+        entity.transactionId = UUID.randomUUID().toString();
+        entity.accountId = fromAccount.getAccountId();
+        entity.amount = request.amount();
+        entity.transactionType = "WITHDRAW";
+        entity.sagaId = sagaId;
+        entity.status = "COMPLETED";
+
+        return entity;
+    }
+
     @PrePersist
     public void prePersist() {
         this.createdAt = this.createdAt == null ? LocalDateTime.now() : this.createdAt;
+    }
+
+    public void compensated() {
+        this.status = "COMPENSATED";
     }
 }

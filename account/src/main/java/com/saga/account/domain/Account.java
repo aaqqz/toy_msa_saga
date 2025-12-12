@@ -36,4 +36,12 @@ public class Account {
         this.status = this.status == null ? "ACTIVE" : this.status;
         this.createdAt = this.createdAt == null ? LocalDateTime.now() : this.createdAt;
     }
+
+    public void subtractBalance(BigDecimal amount) {
+        this.balance = this.balance.subtract(amount);
+    }
+
+    public void addBalance(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
 }

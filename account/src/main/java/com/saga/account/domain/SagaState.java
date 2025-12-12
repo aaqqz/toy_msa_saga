@@ -1,5 +1,6 @@
 package com.saga.account.domain;
 
+import com.saga.common.dto.TransferDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,8 +39,28 @@ public class SagaState {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    public static SagaState started(String sagaId, TransferDto.TransferRequest request, Account fromAccount) {
+        SagaState entity = new SagaState();
+        entity.sagaId = sagaId;
+        entity.patternType = "ORCHESTRATION";
+        entity.fromAccountId = fromAccount.getAccountId();
+        entity.toAccountId = request.toAccountNumber();
+        entity.amount = request.amount();
+        entity.status = "STARTED";
+
+        return entity;
+    }
+
     @PrePersist
     public void prePersist() {
         this.createdAt = this.createdAt == null ? LocalDateTime.now() : this.createdAt;
+    }
+
+    public void completed() {
+        this.status = "COMPLETED";
+    }
+
+    public void compensated() {
+        this.status = "COMPENSATED";
     }
 }
