@@ -1,6 +1,7 @@
 package com.saga.transaction.domain;
 
 import com.saga.common.dto.DepositDto;
+import com.saga.common.event.TransferEvent;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,6 +46,19 @@ public class Deposit {
         entity.amount = request.amount();
         entity.status = "COMPLETED";
         entity.sagaId = request.sagaId();
+
+        return entity;
+    }
+
+    // todo TransferEvent.WithdrawSuccessEvent, DepositDto.DepositRequest object 의 필드 변수 naming 확인 필요
+    public static Deposit completed(String depositId, String transactionId, TransferEvent.WithdrawSuccessEvent event) {
+        Deposit entity = new Deposit();
+        entity.depositId = depositId;
+        entity.transactionId = transactionId;
+        entity.accountNumber = event.toAccountNumber();
+        entity.amount = event.amount();
+        entity.status = "COMPLETED";
+        entity.sagaId = event.sagaId();
 
         return entity;
     }
