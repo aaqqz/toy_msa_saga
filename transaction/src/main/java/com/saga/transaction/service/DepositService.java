@@ -1,0 +1,64 @@
+package com.saga.transaction.service;
+
+import com.saga.common.dto.DepositDto;
+import com.saga.common.dto.NotificationDto;
+import com.saga.transaction.domain.Deposit;
+import com.saga.transaction.domain.Transaction;
+import com.saga.transaction.repository.DepositRepository;
+import com.saga.transaction.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.UUID;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class DepositService {
+
+    private final TransactionRepository transactionRepository;
+    private final DepositRepository depositRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final WebClient webClient;
+    @Value("${service.notification.url}")
+    private String notificationServiceUrl;
+
+    @Transactional
+    public DepositDto.DepositResponse processDeposit(DepositDto.DepositRequest request) {
+        try {
+            String transactionId = UUID.randomUUID().toString();
+            String depositId = UUID.randomUUID().toString();
+
+            Transaction transaction = Transaction.completed(transactionId, request);
+            transactionRepository.save(transaction);
+
+            Deposit deposit = Deposit.completed(depositId, transactionId, request);
+            depositRepository.save(deposit);
+
+            try {
+                NotificationDto.NotificationRequest notificationRequest = NotificationDto.NotificationRequest.depositSuccess(request);
+
+                webClient.post()
+                        .uri(notificationServiceUrl + "/internal/norification")
+                        .bodyValue(notificationRequest)
+                        .retrieve()
+                        .bodyToMono(NotificationDto.NotificationResponse.class)
+                        .block();
+
+            } catch (Exception e) {
+                log.error("Error processing deposit request", e.getMessage(), e);
+                // todo 데이터 유실이 어느정도 허용된다면 모든 상황에 보상 트랜젝션이 필요한 것은 아니다
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+        return null;
+    }
+}

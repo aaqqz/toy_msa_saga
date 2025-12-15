@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class AccountApplication {
 
     @Bean
-    public WebClient webClientaaa() {
+    public WebClient webClient() {
         return WebClient.builder().build();
     }
 

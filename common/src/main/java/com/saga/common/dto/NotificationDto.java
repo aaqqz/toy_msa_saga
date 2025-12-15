@@ -8,6 +8,14 @@ public class NotificationDto {
             String notificationType,
             String message
     ) {
+        public static NotificationRequest depositSuccess(DepositDto.DepositRequest request) {
+            return new NotificationRequest(
+                    request.sagaId(),
+                    request.accountNumber(),
+                    "DEPOSIT_SUCCESS",
+                    "Received " + request.amount() + " from " + request.fromAccountNumber()
+            );
+        }
     }
 
     public record NotificationResponse(

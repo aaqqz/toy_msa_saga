@@ -63,4 +63,8 @@ public class SagaState {
     public void compensated() {
         this.status = "COMPENSATED";
     }
+
+    public void notificationFailed() {
+        this.status = "COMPLETED_WITH_NOTIFICATION_FAILURE";
+    }
 }

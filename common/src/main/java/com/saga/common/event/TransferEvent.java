@@ -10,6 +10,9 @@ public class TransferEvent {
             String toAccountNumber,
             BigDecimal amount
     ) {
+        public static WithdrawSuccessEvent success(String sagaId, String accountNumber, String toAccountNumber, BigDecimal amount) {
+            return new WithdrawSuccessEvent(sagaId, accountNumber, toAccountNumber, amount);
+        }
     }
 
     public record WithdrawFailedEvent(
@@ -17,6 +20,17 @@ public class TransferEvent {
             String accountNumber,
             String reason
     ) {
+        public static TransferEvent.WithdrawFailedEvent insufficientBalance(String sagaId, String accountNumber) {
+            return  new TransferEvent.WithdrawFailedEvent(sagaId, accountNumber, "Insufficient balance");
+        }
+
+        public static TransferEvent.WithdrawFailedEvent unknownError(String sagaId, String accountNumber, String message) {
+            return  new TransferEvent.WithdrawFailedEvent(
+                    sagaId,
+                    accountNumber,
+                    message != null ? message : "Unkown error"
+            );
+        }
     }
 
     public record DepositSuccessEvent(
