@@ -26,6 +26,13 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("mysql:mysql-connector-java:8.0.33")
 
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+    testCompileOnly("org.projectlombok:lombok")
+    testAnnotationProcessor("org.projectlombok:lombok")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.kafka:spring-kafka-test")
