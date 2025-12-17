@@ -15,7 +15,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -47,7 +46,7 @@ public class DepositService {
                 NotificationDto.NotificationRequest notificationRequest = NotificationDto.NotificationRequest.depositSuccess(request);
 
                 webClient.post()
-                        .uri(notificationServiceUrl + "/internal/norification")
+                        .uri(notificationServiceUrl + "/internal/notification")
                         .bodyValue(notificationRequest)
                         .retrieve()
                         .bodyToMono(NotificationDto.NotificationResponse.class)
@@ -57,11 +56,12 @@ public class DepositService {
                 log.error("Error processing deposit request", e.getMessage(), e);
                 // todo 데이터 유실이 어느정도 허용된다면 모든 상황에 보상 트랜젝션이 필요한 것은 아니다
             }
+
+            return new DepositDto.DepositResponse(depositId, "COMPLETED");
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
     @Transactional

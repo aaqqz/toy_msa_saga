@@ -52,7 +52,7 @@ public class OrchestrationService {
             AccountTransaction withdrawTx = AccountTransaction.withdraw(sagaId, request, fromAccount);
             accountTransactionRepository.save(withdrawTx);
 
-            SagaState sagaState = SagaState.started(sagaId, request, fromAccount);
+            SagaState sagaState = SagaState.startedByOrchestration(sagaId, request, fromAccount);
             sagaStateRepository.save(sagaState);
 
             try {

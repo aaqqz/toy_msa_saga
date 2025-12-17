@@ -39,10 +39,22 @@ public class SagaState {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public static SagaState started(String sagaId, TransferDto.TransferRequest request, Account fromAccount) {
+    public static SagaState startedByOrchestration(String sagaId, TransferDto.TransferRequest request, Account fromAccount) {
         SagaState entity = new SagaState();
         entity.sagaId = sagaId;
         entity.patternType = "ORCHESTRATION";
+        entity.fromAccountId = fromAccount.getAccountId();
+        entity.toAccountId = request.toAccountNumber();
+        entity.amount = request.amount();
+        entity.status = "STARTED";
+
+        return entity;
+    }
+
+    public static SagaState startedByChoreography(String sagaId, TransferDto.TransferRequest request, Account fromAccount) {
+        SagaState entity = new SagaState();
+        entity.sagaId = sagaId;
+        entity.patternType = "CHOREOGRAPHY";
         entity.fromAccountId = fromAccount.getAccountId();
         entity.toAccountId = request.toAccountNumber();
         entity.amount = request.amount();

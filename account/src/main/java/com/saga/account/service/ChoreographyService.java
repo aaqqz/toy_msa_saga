@@ -49,7 +49,7 @@ public class ChoreographyService {
             AccountTransaction withdrawTx = AccountTransaction.withdraw(sagaId, request, fromAccount);
             accountTransactionRepository.save(withdrawTx);
 
-            SagaState sagaState = SagaState.started(sagaId, request, fromAccount);
+            SagaState sagaState = SagaState.startedByChoreography(sagaId, request, fromAccount);
             sagaStateRepository.save(sagaState);
 
             WithdrawSuccessEvent successEvent = WithdrawSuccessEvent.success(sagaId, request.fromAccountNumber(), request.toAccountNumber(), request.amount());
